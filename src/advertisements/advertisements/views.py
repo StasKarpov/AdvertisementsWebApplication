@@ -11,7 +11,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 
 
@@ -68,33 +68,59 @@ class Advertisement(viewsets.ViewSet):
     """
     Get list of Advertisement and add new advertisement
     """
-    #list all ads in category
-    def listAdsForCategory(self,request,pk):
-        category = get_object_or_404(Category.objects.all(),
-                                    pk=pk)
-        advertisements = AdvertisementModel.objects.filter(category=category)
-        serializer = AdvertisementSerializer(advertisements, many=True)
-        return Response(JSONRenderer().render(serializer.data),
-                        status=status.HTTP_200_OK)
-    #list all ads in  subcategory
-    def listAdsForSubCategory(self,request,pk):
-        subcategory = get_object_or_404(SubCategory.objects.all(),
-                                    pk=request['subcategory_id'])
-        advertisements = AdvertisementModel.objects.filter(category=category)
-        serializer = AdvertisementSerializer(advertisements, many=True)
+
+    #packs advertisements makes pagination and sends response
+    def paginatedResponse(self,advertisements,page=1):
+        paginator = Paginator(advertisements,10)
+        try:
+            ads = paginator.page(page)
+        except EmptyPage:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = AdvertisementSerializer(ads,many=True)
         return Response(JSONRenderer().render(serializer.data),
                         status=status.HTTP_200_OK)
 
-    def listAllAds(self,request):
-        advertisements = AdvertisementModel.objects.all()
-        serializer = AdvertisementSerializer(advertisements, many=True)
+    def get(self,request,pk):
+        ad = get_object_or_404(AdvertisementModel.objects.all(),pk=pk)
+        serializer = AdvertisementSerializer(ad)
         return Response(JSONRenderer().render(serializer.data),
                         status=status.HTTP_200_OK)
+
+    #list all ads in category
+    def listAdsForCategory(self,request,pk,page=1):
+        category = get_object_or_404(Category.objects.all(),
+                                    pk=pk)
+        advertisements = AdvertisementModel.objects.filter(category=category)
+        return self.paginatedResponse(advertisements=advertisements,page=page)
+    #list all ads in  subcategory
+    def listAdsForSubCategory(self,request,pk,page=1):
+        subcategory = get_object_or_404(SubCategory.objects.all(),
+                                    pk=request['subcategory_id'])
+        advertisements = AdvertisementModel.objects.filter(subcategory=subcategory)
+        return self.paginatedResponse(advertisements=advertisements,page=page)
+
+
+    def listAllAds(self,request,page=1):
+        advertisements = AdvertisementModel.objects.all()
+        return self.paginatedResponse(advertisements=advertisements,page=page)
+
+
+    def listAdsForUser(self,request,userid,page=1):
+        #TODO:check if user exist
+        advertisements = AdvertisementModel.objects.filter(author_id=userid)
+        return self.paginatedResponse(advertisements=advertisements,page=page)
 
     def post(self,request):
         serializer = AdvertisementSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(JSONRenderer().render(serializer.data),
-                            status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self,request,pk):
+        ad = get_object_or_404(AdvertisementModel.objects.all(),pk=pk)
+        serializer = AdvertisementSerializer(ad,data=request.data,partial=True)
+        if serializer.is_valid():
+           serializer.save()
+           return Response(status=status.HTTP_202_ACCEPTED)
+        return Response( status=status.HTTP_400_BAD_REQUEST)

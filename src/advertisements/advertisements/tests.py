@@ -5,6 +5,8 @@ from advertisements.models import *
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 import json
+from advertisements.serializers import AdvertisementSerializer
+
 
 class TestAdvertisements(TestCase):
     def setUp(self):
@@ -31,7 +33,8 @@ class TestAdvertisements(TestCase):
             Advertisement.objects.create(category=Category.objects.all()[0],
                                         subcategory=SubCategory.objects.all()[0],
                                         title='test' + str(counter),
-                                        price=counter)
+                                        price=counter,
+                                        author_id=counter)
             counter+=1
 
 
@@ -97,10 +100,29 @@ class TestAdvertisements(TestCase):
         self.assertEqual(request.status_code,201)
         self.assertEqual(Advertisement.objects.all().count(),1)
 
+    def testEditAdvertisement(self):
+        self.create_adverisements(number=1)
+        ad = Advertisement.objects.all()[0]
+        oldprice = ad.price
+        request = self.client.put('/advertisement/'+str(ad.id)+'/edit/',
+                                    {
+                                    'price' : oldprice+1
+                                    })
+        self.assertEqual(request.status_code,202)
+        self.assertEqual(oldprice+1,Advertisement.objects.all()[0].price)
+
+    def testGetAd(self):
+        self.create_adverisements(number=1)
+        ad = Advertisement.objects.all()[0]
+        request = self.client.get('/advertisement/'+ str(ad.id) + '/')
+        self.assertEqual(request.status_code,200)
+        adJson = json.loads(request.data)
+        self.assertEqual(adJson['id'],ad.pk)
+
     def testListAdvertisementsForCategory(self):
         self.create_adverisements(number=10)
         request = self.client.get('/category/' +
-                                str(Category.objects.all()[0].id) + '/')
+                                str(Category.objects.all()[0].id) + '/1/')
         advertisements = json.loads(request.data)
         self.assertEqual(len(advertisements),10)
         self.assertEqual(request.status_code,200)
@@ -108,17 +130,70 @@ class TestAdvertisements(TestCase):
     def testListAdvertisementsForSubCategory(self):
         self.create_adverisements(number=10)
         request = self.client.get('/sub_category/' +
-                                str(SubCategory.objects.all()[0].id) + '/')
+                                str(SubCategory.objects.all()[0].id) + '/1/')
         advertisements = json.loads(request.data)
         self.assertEqual(len(advertisements),10)
         self.assertEqual(request.status_code,200)
 
     def testAllAdvertisements(self):
         self.create_adverisements(number=10)
-        request = self.client.get('/advertisement/')
+        request = self.client.get('/advertisements/1/')
         advertisements = json.loads(request.data)
         self.assertEqual(len(advertisements),10)
         self.assertEqual(request.status_code,200)
+
+    def testAdsOfUser(self):
+        self.create_adverisements(number=1)
+        ad = Advertisement.objects.all()[0]
+        request = self.client.get('/user/'+str(ad.author_id)+'/advertisements/')
+        self.assertEqual(request.status_code,200)
+        advertisements = json.loads(request.data)
+        self.assertEqual(advertisements[0]['id'],ad.pk)
+
+    def testPaginationListAdvertisementsForCategory(self):
+        self.create_adverisements(number=15)
+        request = self.client.get('/category/' +
+                                str(Category.objects.all()[0].id) + '/1/')
+        firstPage = json.loads(request.data)
+        self.assertEqual(len(firstPage),10)
+        self.assertEqual(request.status_code,200)
+        request = self.client.get('/category/' +
+                                str(Category.objects.all()[0].id) + '/2/')
+        secondPage = json.loads(request.data)
+        self.assertEqual(len(secondPage),5)
+        self.assertEqual(request.status_code,200)
+
+    def testPaginationListAdvertisementsForSubCategory(self):
+        self.create_adverisements(number=15)
+        request = self.client.get('/sub_category/' +
+                                str(SubCategory.objects.all()[0].id) + '/1/')
+        firstPage = json.loads(request.data)
+        self.assertEqual(len(firstPage),10)
+        self.assertEqual(request.status_code,200)
+        request = self.client.get('/sub_category/' +
+                                str(SubCategory.objects.all()[0].id) + '/2/')
+        secondPage = json.loads(request.data)
+        self.assertEqual(len(secondPage),5)
+        self.assertEqual(request.status_code,200)
+
+    def testPaginationAllAdvertisements(self):
+        self.create_adverisements(number=15)
+        request = self.client.get('/advertisements/1/')
+        firstPage = json.loads(request.data)
+        self.assertEqual(len(firstPage),10)
+        self.assertEqual(request.status_code,200)
+        request2 = self.client.get('/advertisements/2/')
+        secondPage = json.loads(request2.data)
+        self.assertEqual(len(secondPage),5)
+        self.assertEqual(request.status_code,200)
+
+    def testPaginationEmptyPage(self):
+        request = self.client.get('/advertisements/2/')
+        self.assertEqual(request.status_code,404)
+
+
+
+
 
 
 
