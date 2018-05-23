@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
-from advertisements.views import *
-
+from advertisements.views_advertisements import *
+from advertisements.views_user import *
 urlpatterns = [
     #create subcategory
     url(r'sub_category/create/$', SubCategory.as_view()),
@@ -25,4 +25,10 @@ urlpatterns = [
     url(r'advertisements/(?P<page>[0-9]+|)/$', Advertisement.as_view({'get':'listAllAds'})),
     #get ads for user.id
     url(r'user/(?P<userid>[0-9]+)/advertisements/$', Advertisement.as_view({'get':'listAdsForUser'})),
+
+
+    #auth
+    url(r'user/register/$', UserCreationView.as_view()),
+    url(r'user/login/$', UserLoginView.as_view()),
+    url(r'user/logout/$', UserLogoutView.as_view()),
 ]

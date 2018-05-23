@@ -23,7 +23,7 @@ class TestAdvertisements(TestCase):
         counter = 1
         while counter != numberOfSubs+1 :
             SubCategory.objects.create(category=Category.objects.all()[0],
-                                        title='testSub' + str(numberOfSubs))
+                                        title='testSub' + str(counter))
             counter+=1
 
     def create_adverisements(self,number=10):
