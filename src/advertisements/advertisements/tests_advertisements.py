@@ -145,7 +145,7 @@ class TestAdvertisements(TestCase):
     def testAdsOfUser(self):
         self.create_adverisements(number=1)
         ad = Advertisement.objects.all()[0]
-        request = self.client.get('/user/'+str(ad.author_id)+'/advertisements/')
+        request = self.client.get('/user/'+str(ad.author_id)+'/advertisements/1/')
         self.assertEqual(request.status_code,200)
         advertisements = json.loads(request.data)
         self.assertEqual(advertisements[0]['id'],ad.pk)
@@ -191,6 +191,11 @@ class TestAdvertisements(TestCase):
         request = self.client.get('/advertisements/2/')
         self.assertEqual(request.status_code,404)
 
+    def testDeleteAdvertisement(self):
+        self.create_adverisements(number=1)
+        request = self.client.delete('/advertisement/'+str(1)+'/delete/')
+        self.assertEqual(request.status_code,200)
+        self.assertEqual(Advertisement.objects.all().count(),0)
 
 
 

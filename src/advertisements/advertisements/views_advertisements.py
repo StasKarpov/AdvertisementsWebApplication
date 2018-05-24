@@ -124,3 +124,8 @@ class Advertisement(viewsets.ViewSet):
            serializer.save()
            return Response(status=status.HTTP_202_ACCEPTED)
         return Response( status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self,request,pk):
+        ad = get_object_or_404(AdvertisementModel.objects.all(), pk=pk)
+        ad.delete()
+        return Response(status=status.HTTP_200_OK)

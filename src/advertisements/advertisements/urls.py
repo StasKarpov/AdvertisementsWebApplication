@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'sub_category/(?P<pk>[0-9]+)/(?P<page>[0-9]+)/$', Advertisement.as_view({'get':'listAdsForSubCategory'})),
     #get single ad
     url(r'advertisement/(?P<pk>[0-9]+)/$', Advertisement.as_view({'get':'get'})),
+    #delete advertisement
+    url(r'advertisement/(?P<pk>[0-9]+)/delete/$', Advertisement.as_view({'delete':'delete'})),
     #get all advertizements
     url(r'advertisements/(?P<page>[0-9]+|)/$', Advertisement.as_view({'get':'listAllAds'})),
     #get ads for user.id

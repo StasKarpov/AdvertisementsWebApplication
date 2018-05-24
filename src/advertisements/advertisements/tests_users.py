@@ -5,7 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token as TokenModel
-from advertisements import viewsUser
+from advertisements import views_user
 
 
 BLANK_FIELD = 'This field may not be blank.'
@@ -174,9 +174,9 @@ class UserLogoutTest(TestCase):
     def test_token_deletes_after_loging_out(self):
         self.client.logout()
         # to get token for self.user
-        request = self.client.post('/user/login/', {
-            'username': self.user.username, 'password': 'testcase123'
-        })
+        request = self.client.post('/user/login/',
+        {'username': self.user.username, 'password': 'testcase123'}
+        )
         self.client.logout()
 
         token = TokenModel.objects.get(user=self.user)
