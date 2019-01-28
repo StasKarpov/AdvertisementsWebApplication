@@ -1,5 +1,5 @@
 # AdvertisementsWebApplication
-This a backend for a simple advertizements board.
+This is a backend for a simple advertizements board.
 To run program open your cmd/terminal and type
 ```console
 git clone https://github.com/StasKarpov/AdvertisementsWebApplication/
