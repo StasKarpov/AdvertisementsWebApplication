@@ -10,7 +10,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 Now you have a backend running on 127.0.0.1:8000
-which you ca access with the help of this fancy API map :)
+which you can access with the help of this fancy API map :)
 
 
 ![](https://github.com/StasKarpov/AdvertisementsWebApplication/blob/master/API_fancy_map.png)
