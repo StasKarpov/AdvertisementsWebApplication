@@ -5,7 +5,7 @@ To run program open your cmd/terminal and type
 git clone https://github.com/StasKarpov/AdvertisementsWebApplication/
 cd AdvertisementsWebApplication
 pip install -r requirements.txt
-cd advertizements
+cd advertisements
 python manage.py migrate
 python manage.py runserver
 ```
