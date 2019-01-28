@@ -1,6 +1,6 @@
 # AdvertisementsWebApplication
 This is a backend for a simple advertizements board.
-To run program open your cmd/terminal and type
+To run program make sure that you have python 3 installed and then open your cmd/terminal and type
 ```console
 git clone https://github.com/StasKarpov/AdvertisementsWebApplication/
 cd AdvertisementsWebApplication
