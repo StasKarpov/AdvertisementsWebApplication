@@ -78,18 +78,10 @@ WSGI_APPLICATION = 'advertisements.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'NAME': 'DSE_ADS',
-    #     'ENGINE': 'sqlserver_pymssq',
-    #     'HOST': '176.9.61.113',
-    #     'USER': 'DSEUser',
-    #     'PASSWORD': 'dse*dse=ss2018',
-    # },
     'default': {
         'NAME': 'test',
         'ENGINE': 'django.db.backends.sqlite3'
     }
-
 }
 
 
